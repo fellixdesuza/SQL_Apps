@@ -48,5 +48,15 @@ namespace HotelProject.Tests
 
             _repository.UpdateManager(newManager);
         }
+        [Fact]
+
+        public void DeleteManagers()
+        {
+            Manager manager = new()
+            {
+                LastName = "ალიევი"
+            };
+            _repository.DeleteManager(manager);
+        }
     }
 }

@@ -148,5 +148,32 @@ namespace HotelProject.Repository
 
 
         }
+
+        public void DeleteManager(Manager manager)
+        {
+            string sqlDelete = @$"DELETE FROM Managers WHERE LastName = N'{manager.LastName}'";
+
+            using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
+            {
+                try
+                {
+                    SqlCommand command = new SqlCommand(sqlDelete, connection);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+
+
+
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+
+            }
+        }
     }
 }

@@ -55,5 +55,14 @@ namespace HotelProject.Tests
 
             _repository.UpdateHotel(newHotel);
         }
+        [Fact]
+        public void DeleteFromHotel()
+        {
+            Hotel hotel = new()
+            {
+                HotelName = "Paragraph"
+            };
+            _repository.DeleteHotel(hotel);
+        }
     }
 }

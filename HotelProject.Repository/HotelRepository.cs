@@ -153,5 +153,32 @@ namespace HotelProject.Repository
 
 
         }
+
+        public void DeleteHotel(Hotel hotel)
+        {
+            string sqlDelete = @$"DELETE FROM Hotels WHERE HotelName = N'{hotel.HotelName}'";
+
+            using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
+            {
+                try
+                {
+                    SqlCommand command = new SqlCommand(sqlDelete, connection);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+
+
+
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+
+            }
+        }
     }
 }
