@@ -17,46 +17,50 @@ namespace HotelProject.Tests
         }
 
         [Fact]
-        public void GetManagers()
+        public async void GetManagers()
         {
-            var result = _repository.GetManagers();
+            var result = await _repository.GetManagers();
         }
 
         [Fact]
 
-        public void AddNewManager() 
+        public async void AddNewManager() 
         {
             Manager newManager = new()
             {
-                FirstName = "ხათუნა",
-                LastName = "ალიევი"
+                FirstName = "ტატიანა",
+                LastName = "კოტოვა",
+                HotelId = 5
             };
 
-            _repository.AddManager(newManager);
+            await _repository.AddManager(newManager);
         }
 
         [Fact]
 
-        public void UpdateExistingManagers()
+        public async void UpdateExistingManagers()
         {
             Manager newManager = new()
             {
-                Id = 2,
-                FirstName = "დურუ",
-                LastName = "ხურცილავა"
+                Id = 1,
+                FirstName = "მია",
+                LastName = "ხალიფაშვილი",
+                HotelId = 1
             };
 
-            _repository.UpdateManager(newManager);
+            await _repository.UpdateManager(newManager);
         }
         [Fact]
 
-        public void DeleteManagers()
+        public async void DeleteManagers()
         {
-            Manager manager = new()
-            {
-                LastName = "ალიევი"
-            };
-            _repository.DeleteManager(manager);
+            await _repository.DeleteManager(1);
+        }
+
+        [Fact]
+        public async void GetSingleManager()
+        {
+            var result = await _repository.ShowSingleManager(1);
         }
     }
 }

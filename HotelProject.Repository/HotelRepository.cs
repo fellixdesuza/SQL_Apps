@@ -7,24 +7,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
+using System.Diagnostics.Metrics;
+using System.Net.NetworkInformation;
 
 namespace HotelProject.Repository
 {
     public class HotelRepository
     {
 
-        public List<Hotel> GetHotels()
+        public async Task<List<Hotel>> GetHotels()
         {
             List<Hotel> result = new();
-            const string sqlSel = "SELECT * FROM Hotels";
+            const string sqlSel = "sp_GetAllHotels";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlSel, connection);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
 
                     while (reader.Read())
                     {
@@ -49,7 +54,7 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
 
             }
@@ -57,18 +62,29 @@ namespace HotelProject.Repository
             return result;
         }
 
-        public void AddHotel(Hotel hotel)
+        public async Task AddHotel(Hotel hotel)
         {
-            string sqlAdd = @$"INSERT INTO Hotels(HotelName, Rating, Country, City, PhisicalAddress)VALUES(N'{hotel.HotelName}', {hotel.Rating}, N'{hotel.Country}', N'{hotel.City}', N'{hotel.PhisicalAddress}')";
+            string sqlAdd = "sp_AddHotel";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlAdd, connection);
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    command.CommandType = CommandType.StoredProcedure;
 
+                    command.Parameters.AddWithValue("name", hotel.HotelName);
+                    command.Parameters.AddWithValue("rating", hotel.Rating);
+                    command.Parameters.AddWithValue("country", hotel.Country);
+                    command.Parameters.AddWithValue("city", hotel.City);
+                    command.Parameters.AddWithValue("phyisicalAddress", hotel.PhisicalAddress);
+
+                    await connection.OpenAsync();
+                    int rowsEffect = await command.ExecuteNonQueryAsync();
+
+                    if (rowsEffect == 0) {
+                        throw new InvalidOperationException("Command effected zero rows");
+                    }
 
 
                 }
@@ -78,14 +94,14 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
 
             }
 
         }
 
-        public void UpdateHotel(Hotel hotel)
+        public async Task UpdateHotel(Hotel hotel)
         {
             int hotelCount = 0;
             const string sqlSel = "SELECT COUNT (*) FROM Hotels";
@@ -95,8 +111,8 @@ namespace HotelProject.Repository
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlSel, connection);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
 
                     while (reader.Read())
                     {
@@ -113,7 +129,7 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
 
             }
@@ -121,14 +137,23 @@ namespace HotelProject.Repository
             if (hotel.Id <= hotelCount)
             {
 
-                string sqlUpdate = @$"UPDATE Hotels SET HotelName = N'{hotel.HotelName}',Rating = {hotel.Rating}, Country = N'{hotel.Country}', City = N'{hotel.City}', PhisicalAddress = N'{hotel.PhisicalAddress}' WHERE Id = {hotel.Id}";
+                string sqlUpdate = "sp_UpdateHotel";
 
                 using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
                 {
                     try
                     {
                         SqlCommand command = new SqlCommand(sqlUpdate, connection);
-                        connection.Open();
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.AddWithValue("name", hotel.HotelName);
+                        command.Parameters.AddWithValue("rating", hotel.Rating);
+                        command.Parameters.AddWithValue("country", hotel.Country);
+                        command.Parameters.AddWithValue("city", hotel.City);
+                        command.Parameters.AddWithValue("phisicalAddress", hotel.PhisicalAddress);
+                        command.Parameters.AddWithValue("hotelId", hotel.Id);
+
+                        await connection.OpenAsync();
                         command.ExecuteNonQuery();
 
 
@@ -140,7 +165,7 @@ namespace HotelProject.Repository
                     }
                     finally
                     {
-                        connection.Close();
+                        await connection.CloseAsync();
                     }
 
                 }
@@ -154,17 +179,20 @@ namespace HotelProject.Repository
 
         }
 
-        public void DeleteHotel(Hotel hotel)
+        public async Task DeleteHotel(int id)
         {
-            string sqlDelete = @$"DELETE FROM Hotels WHERE HotelName = N'{hotel.HotelName}'";
+            string sqlDelete = "sp_DeleteHotel";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlDelete, connection);
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("hotelId", id);
+
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
 
 
 
@@ -175,10 +203,54 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
 
             }
+        }
+
+        public async Task<Hotel> ShowSingleHotel(int id)
+        {
+            Hotel result = new();
+            const string sqlSel = "sp_ShowSingleHotel";
+
+            using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
+            {
+                try
+                {
+                    SqlCommand command = new SqlCommand(sqlSel, connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("hotelId", id);
+
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        if (reader.HasRows)
+                        {
+                            result.Id = reader.GetInt32(0);
+                            result.HotelName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty;
+                            result.Rating = reader.GetDouble(2);
+                            result.Country = !reader.IsDBNull(3) ? reader.GetString(3) : string.Empty;
+                            result.City = !reader.IsDBNull(4) ? reader.GetString(4) : string.Empty;
+                            result.PhisicalAddress = !reader.IsDBNull(5) ? reader.GetString(5) : string.Empty;
+
+                        } 
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    await connection.CloseAsync();
+                }
+
+            }
+
+            return result;
         }
     }
 }

@@ -18,51 +18,55 @@ namespace HotelProject.Tests
         }
 
         [Fact]
-        public void GetHotels()
+        public async void GetHotels()
         {
-            var result = _repository.GetHotels();
+            var result = await _repository.GetHotels();
         }
 
         [Fact]
 
-        public void AddNewHotels()
+        public async void AddNewHotels()
         {
             Hotel newHotel = new()
             {
-                HotelName = "Shato Tvaladi",
-                Rating = 10.2,
+                HotelName = "Palm",
+                Rating = 7.0,
                 Country = "Georgia",
-                City = "Kaspi",
-                PhisicalAddress = "Vilage Tvaladi, Kaspi, Shida Kartli, Georgia"
+                City = "Blikviri",
+                PhisicalAddress = "Blikviri Dsitrict, Georgia"
             };
 
-            _repository.AddHotel(newHotel);
+            await _repository.AddHotel(newHotel);
         }
 
         [Fact]
 
-        public void UpdateExistingHotels()
+        public async void UpdateExistingHotels()
         {
             Hotel newHotel = new()
             {
-                Id = 4,
+               
                 HotelName = "Tvaladuri",
                 Rating = 9.99,
                 Country = "Sakartvelo",
                 City = "Kaspi",
-                PhisicalAddress = "Village Tvaladi, Kaspi, Shida Kartli, Georgia"
+                PhisicalAddress = "Village Tvaladi, Kaspi, Shida Kartli, Georgia",
+                Id = 4
             };
 
-            _repository.UpdateHotel(newHotel);
+            await _repository.UpdateHotel(newHotel);
         }
         [Fact]
-        public void DeleteFromHotel()
+        public async void DeleteFromHotel()
         {
-            Hotel hotel = new()
-            {
-                HotelName = "Paragraph"
-            };
-            _repository.DeleteHotel(hotel);
+          
+            await _repository.DeleteHotel(4);
+        }
+
+        [Fact]
+        public async void GetSingleHotel()
+        {
+            var result = await _repository.ShowSingleHotel(1);
         }
     }
 }

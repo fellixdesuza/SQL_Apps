@@ -1,8 +1,10 @@
 ﻿using HotelProject.Data;
+using HotelProject.Model;
 using HotelProjectModel;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,18 +13,19 @@ namespace HotelProject.Repository
 {
     public class ManagerRepository
     {
-        public List<Manager> GetManagers()
+        public async Task<List<Manager>> GetManagers()
         {
             List<Manager> result  = new ();
-            const string sqlSel = "SELECT * FROM Managers";
+            const string sqlSel = "sp_GetAllManagers";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {                
                     SqlCommand command = new SqlCommand (sqlSel, connection);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader ();
+                    command.CommandType = CommandType.StoredProcedure;
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
 
                     while (reader.Read ())
                     {
@@ -32,7 +35,8 @@ namespace HotelProject.Repository
                             {
                             Id = reader.GetInt32(0),
                             FirstName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
-                            LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty
+                            LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty,
+                            HotelId = !reader.IsDBNull(3) ? reader.GetInt32(3) : 0
                             });
                         }
                     }
@@ -44,7 +48,7 @@ namespace HotelProject.Repository
                 }
                 finally
                 { 
-                    connection.Close ();
+                    await connection.CloseAsync();
                 }
 
             }
@@ -52,17 +56,25 @@ namespace HotelProject.Repository
             return result;
         }
 
-        public void AddManager(Manager manager)
+        public async Task AddManager(Manager manager)
         {
-            string sqlAdd= @$"INSERT INTO Managers(FirstName, lastName)VALUES(N'{manager.FirstName}', N'{manager.LastName}')";
+            string sqlAdd= "sp_AddManager";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlAdd, connection);
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    command.CommandType = CommandType.StoredProcedure;
+
+
+                    command.Parameters.AddWithValue("firstName", manager.FirstName);
+                    command.Parameters.AddWithValue("lastName", manager.LastName);
+                    command.Parameters.AddWithValue("hotelID", manager.HotelId);
+               
+
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
 
                    
 
@@ -73,14 +85,14 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
 
             }
 
         }
 
-        public void  UpdateManager(Manager manager)
+        public async Task  UpdateManager(Manager manager)
         {
             int managerCount = 0;
             const string sqlSel = "SELECT COUNT (*) FROM Managers";
@@ -90,8 +102,9 @@ namespace HotelProject.Repository
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlSel, connection);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
 
                     while (reader.Read())
                     {
@@ -108,23 +121,30 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
+
                 }
-
             }
-
             if (manager.Id <= managerCount)
             {
 
-                string sqlUpdate = @$"UPDATE Managers SET FirstName = N'{manager.FirstName}', LastName = N'{manager.LastName}' WHERE Id = {manager.Id}";
+                string sqlUpdate = "sp_UpdateManager";
 
                 using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
                 {
                     try
                     {
                         SqlCommand command = new SqlCommand(sqlUpdate, connection);
-                        connection.Open();
-                        command.ExecuteNonQuery();
+                        command.CommandType = CommandType.StoredProcedure;
+
+
+                        command.Parameters.AddWithValue("firstName", manager.FirstName);
+                        command.Parameters.AddWithValue("lastName", manager.LastName);
+                        command.Parameters.AddWithValue("hotelID", manager.HotelId);
+                        command.Parameters.AddWithValue("id", manager.Id);
+
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();
 
 
 
@@ -135,7 +155,7 @@ namespace HotelProject.Repository
                     }
                     finally
                     {
-                        connection.Close();
+                        await connection.CloseAsync();
                     }
 
                 }
@@ -149,17 +169,21 @@ namespace HotelProject.Repository
 
         }
 
-        public void DeleteManager(Manager manager)
+        public async Task DeleteManager(int id)
         {
-            string sqlDelete = @$"DELETE FROM Managers WHERE LastName = N'{manager.LastName}'";
+            string sqlDelete = "sp_DeleteManager";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
                     SqlCommand command = new SqlCommand(sqlDelete, connection);
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("id", id);
+
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
 
 
 
@@ -170,10 +194,53 @@ namespace HotelProject.Repository
                 }
                 finally
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
 
             }
         }
+
+        public async Task<Manager> ShowSingleManager(int id)
+        {
+            Manager result = new();
+            const string sqlSel = "sp_ShowSingleManager";
+
+            using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
+            {
+                try
+                {
+                    SqlCommand command = new SqlCommand(sqlSel, connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("managerId", id);
+
+                    await connection.OpenAsync();
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        if (reader.HasRows)
+                        {
+                            result.FirstName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty;
+                            result.LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty;
+                            result.HotelId = !reader.IsDBNull(3) ? reader.GetInt32(3) : 0;
+
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    await connection.CloseAsync();
+                }
+
+            }
+
+            return result;
+        }
+
     }
 }
