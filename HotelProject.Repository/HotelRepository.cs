@@ -1,6 +1,6 @@
 ﻿using HotelProject.Data;
 using HotelProject.Model;
-using HotelProjectModel;
+using HotelProject.Model;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;

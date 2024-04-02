@@ -1,0 +1,24 @@
+﻿@model List<Room>
+<div class="row">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ოთახის ნომერი</th>
+                <th>ცარიელი/დაკავებული</th>
+                <th>ფასი</th>
+                <th>სასტუმროს ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var room in Model)
+            {
+                <tr>
+                    <td>@room.RoomName</td>
+                    <td>@room.IsFree</td>
+                    <td>@room.DailyPrice</td>
+                    <td>@room.HotelId</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

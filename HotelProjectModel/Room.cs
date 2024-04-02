@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace HotelProject.Model
 {
-    public class Manager
+    public class Room
     {
         public int Id { get; set; }
-        public string FirstName { get; set; }    
-        public string LastName { get; set; }
-
+        public string RoomName { get; set; }
+        public bool IsFree { get; set; }
+        public double DailyPrice { get; set; }
         public int HotelId { get; set; }
+
     }
 }

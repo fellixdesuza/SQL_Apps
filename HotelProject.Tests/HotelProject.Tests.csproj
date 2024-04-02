@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HotelProject.Repository\HotelProject.Repository.csproj" />
+    <ProjectReference Include="..\HotelProjectModel\HotelProject.Model.csproj" />
   </ItemGroup>
 
 </Project>

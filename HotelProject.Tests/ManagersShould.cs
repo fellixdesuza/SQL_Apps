@@ -1,5 +1,5 @@
 ﻿using HotelProject.Repository;
-using HotelProjectModel;
+using HotelProject.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
