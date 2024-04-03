@@ -34,11 +34,11 @@ namespace HotelProject.Repository
                         {
                             result.Add(new Room
                             {
-                                Id = reader.GetInt32(0),
-                                RoomName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
-                                IsFree = !reader.IsDBNull(2) ? reader.GetBoolean(2) : false,
-                                DailyPrice = !reader.IsDBNull(3) ? reader.GetDouble(3) : 0,
-                                HotelId = !reader.IsDBNull(4) ? reader.GetInt32(4) : 0
+                                //Id = reader.GetInt32(0),
+                                RoomName = !reader.IsDBNull(0) ? reader.GetString(0) : string.Empty,
+                                IsFree = !reader.IsDBNull(1) ? reader.GetBoolean(1) : false,
+                                DailyPrice = !reader.IsDBNull(2) ? reader.GetDouble(2) : 0,
+                                HotelName = !reader.IsDBNull(3) ? reader.GetString(3) : string.Empty
                             });
                         }
                     }

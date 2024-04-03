@@ -33,10 +33,10 @@ namespace HotelProject.Repository
                         {
                             result.Add(new Manager 
                             {
-                            Id = reader.GetInt32(0),
-                            FirstName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
-                            LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty,
-                            HotelId = !reader.IsDBNull(3) ? reader.GetInt32(3) : 0
+                            //Id = reader.GetInt32(0),
+                            FirstName = !reader.IsDBNull(0) ? reader.GetString(0) : string.Empty,
+                            LastName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
+                            HotelName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty
                             });
                         }
                     }
