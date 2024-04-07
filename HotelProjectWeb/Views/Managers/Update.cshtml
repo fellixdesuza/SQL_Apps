@@ -1,0 +1,24 @@
+﻿@model Manager
+@{
+    ViewData["Title"] = "მენეჯერის რედაქტირება";
+}
+<div class="row">
+    <form asp-controller="Managers" asp-action="UpdatePOST" method="post">
+        <input asp-for="@Model.Id" hidden />
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label">სახელი</label>
+            <input class="form-control" asp-for="FirstName" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label">გვარი</label>
+            <input class="form-control" asp-for="LastName" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="HotelId" class="form-label">სასტუმროს ID</label>
+            <input class="form-control" asp-for="HotelId" />
+        </div>
+        <div class="mb-3">
+            <input class="btn btn-warning" type="submit" value="რედაქტირება" />
+        </div>
+    </form>
+</div>

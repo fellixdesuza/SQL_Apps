@@ -1,0 +1,23 @@
+﻿@model Manager
+@{
+    ViewData["Title"] = "მენეჯერის წაშლა";
+}
+
+<div class="row">
+    <form asp-controller="Managers" asp-action="DeletePOST" method="post">
+        <input class="form-control" asp-for="Id" hidden />
+        <div class="mb-3">
+            <input class="form-control" asp-for="FirstName" disabled />
+        </div>
+        <div class="mb-3">
+            <input class="form-control" asp-for="LastName" disabled />
+        </div>
+        <div class="mb-3">
+            <input class="form-control" asp-for="HotelId" disabled />
+        </div>
+        <div class="mb-3">
+            <input class="btn btn-danger" type="submit" value="წაშლა" />
+        </div>
+    </form>
+</div>
+

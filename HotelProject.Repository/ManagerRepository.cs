@@ -1,6 +1,5 @@
 ﻿using HotelProject.Data;
 using HotelProject.Model;
-using HotelProject.Model;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -33,10 +32,11 @@ namespace HotelProject.Repository
                         {
                             result.Add(new Manager 
                             {
-                            //Id = reader.GetInt32(0),
-                            FirstName = !reader.IsDBNull(0) ? reader.GetString(0) : string.Empty,
-                            LastName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
-                            HotelName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty
+                            Id = reader.GetInt32(0),
+                            FirstName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
+                            LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty,
+                            HotelName = !reader.IsDBNull(3) ? reader.GetString(3) : string.Empty,
+                            HotelId= !reader.IsDBNull(4) ? reader.GetInt32(4) : 0
                             });
                         }
                     }
@@ -94,39 +94,6 @@ namespace HotelProject.Repository
 
         public async Task  UpdateManager(Manager manager)
         {
-            int managerCount = 0;
-            const string sqlSel = "SELECT COUNT (*) FROM Managers";
-
-            using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
-            {
-                try
-                {
-                    SqlCommand command = new SqlCommand(sqlSel, connection);
-
-                    await connection.OpenAsync();
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                    while (reader.Read())
-                    {
-                        if (reader.HasRows)
-                        {
-                            managerCount = reader.GetInt32(0);
-                        }
-                    }
-
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    await connection.CloseAsync();
-
-                }
-            }
-            if (manager.Id <= managerCount)
-            {
 
                 string sqlUpdate = "sp_UpdateManager";
 
@@ -159,13 +126,6 @@ namespace HotelProject.Repository
                     }
 
                 }
-
-            }
-            else
-            {
-                throw new Exception();
-            }
-
 
         }
 
@@ -220,9 +180,9 @@ namespace HotelProject.Repository
                     {
                         if (reader.HasRows)
                         {
-                            result.FirstName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty;
-                            result.LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty;
-                            result.HotelId = !reader.IsDBNull(3) ? reader.GetInt32(3) : 0;
+                            result.FirstName = !reader.IsDBNull(0) ? reader.GetString(0) : string.Empty;
+                            result.LastName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty;
+                            result.HotelId = !reader.IsDBNull(2) ? reader.GetInt32(2) : 0;
 
 
                         }

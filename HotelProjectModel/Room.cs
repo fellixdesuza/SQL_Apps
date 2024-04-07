@@ -15,6 +15,6 @@ namespace HotelProject.Model
         public int HotelId { get; set; }
 
         public string HotelName { get; set; }
-
+       
     }
 }

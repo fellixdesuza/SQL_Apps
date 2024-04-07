@@ -1,11 +1,15 @@
 ﻿@model List<Manager>
 <div class="row">
+<a class="btn btn-primary w-25 mt-3 mb-3" asp-controller="Managers" asp-action="Create">მენეჯერის დამატება</a>
+</div>
+<div class="row">
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>სახელი</th>
                 <th>გვარი</th>
                 <th>სასტუმროს დასახელება</th>
+                <th>სასტუმროს ID</th>
             </tr>
         </thead>
         <tbody>
@@ -15,7 +19,13 @@
                     <td>@manager.FirstName</td>
                     <td>@manager.LastName</td>
                     <td>@manager.HotelName</td>
+                    <td>@manager.HotelId</td>
+                    <td>
+                        <a asp-controller="Managers" asp-action="Update" asp-route-id="@manager.Id" class="btn btn-warning">რედაქტირება</a>
+                        <a asp-controller="Managers" asp-action="Delete" asp-route-id="@manager.Id" class="btn btn-danger">წაშლა</a>
+                    </td>
                 </tr>
+           
             }
         </tbody>
     </table>

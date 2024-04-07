@@ -1,11 +1,14 @@
 ﻿@model List<Room>
 <div class="row">
+    <a class="btn btn-primary w-25 mt-3 mb-3" asp-controller="Rooms" asp-action="Create">ოთახის დამატება</a>
+</div>
+<div class="row">
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>ოთახის ნომერი</th>
                 <th>ცარიელი/დაკავებული</th>
-                <th>ფასი</th>
+                <th>ოთახის ღირებულება</th>
                 <th>სასტუმროს დასახელება</th>
             </tr>
         </thead>
@@ -17,6 +20,10 @@
                     <td>@room.IsFree</td>
                     <td>@room.DailyPrice</td>
                     <td>@room.HotelName</td>
+                    <td>
+                        <a asp-controller="Rooms" asp-action="Update" asp-route-id="@room.Id" class="btn btn-warning">რედაქტირება</a>
+                        <a asp-controller="Rooms" asp-action="Delete" asp-route-id="@room.Id" class="btn btn-danger">წაშლა</a>
+                    </td>
                 </tr>
             }
         </tbody>
