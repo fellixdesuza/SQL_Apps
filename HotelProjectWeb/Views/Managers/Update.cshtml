@@ -14,8 +14,8 @@
             <input class="form-control" asp-for="LastName" />
         </div>
         <div class="mb-3">
-            <label asp-for="HotelId" class="form-label">სასტუმროს ID</label>
-            <input class="form-control" asp-for="HotelId" />
+            <label asp-for="HotelId">სასტუმრო</label>
+            <select asp-for="HotelId" asp-items="ViewBag.HotelsWithoutManagers" class="form-control"></select>
         </div>
         <div class="mb-3">
             <input class="btn btn-warning" type="submit" value="რედაქტირება" />

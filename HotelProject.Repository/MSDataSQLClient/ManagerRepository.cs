@@ -1,6 +1,6 @@
 ﻿using HotelProject.Data;
-using HotelProject.Model;
-using HotelProject.Model;
+using HotelProject.Models;
+using HotelProject.Repository.Interfaces;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -9,15 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelProject.Repository
+namespace HotelProject.Repository.MSDataSQLClient
 {
-    public class RoomRepository
+    public class ManagerRepository : IManagerRepository
     {
-
-        public async Task<List<Room>> GetRooms()
+        public async Task<List<Manager>> GetManagers()
         {
-            List<Room> result = new();
-            const string sqlSel = "sp_GetAllRooms";
+            List<Manager> result = new();
+            const string sqlSel = "sp_GetAllManagers";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
@@ -32,13 +31,13 @@ namespace HotelProject.Repository
                     {
                         if (reader.HasRows)
                         {
-                            result.Add(new Room
+                            result.Add(new Manager
                             {
                                 Id = reader.GetInt32(0),
-                                RoomName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
-                                IsFree = !reader.IsDBNull(2) ? reader.GetBoolean(2) : false,
-                                DailyPrice = !reader.IsDBNull(3) ? reader.GetDouble(3) : 0,
-                                HotelName = !reader.IsDBNull(4) ? reader.GetString(4) : string.Empty
+                                FirstName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
+                                LastName = !reader.IsDBNull(2) ? reader.GetString(2) : string.Empty,
+                              //  HotelName = !reader.IsDBNull(3) ? reader.GetString(3) : string.Empty,
+                                HotelId = !reader.IsDBNull(4) ? reader.GetInt32(4) : 0
                             });
                         }
                     }
@@ -58,9 +57,9 @@ namespace HotelProject.Repository
             return result;
         }
 
-        public async Task AddRoom(Room room)
+        public async Task AddManager(Manager manager)
         {
-            string sqlAdd = "sp_AddRoom";
+            string sqlAdd = "sp_AddManager";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
@@ -70,10 +69,9 @@ namespace HotelProject.Repository
                     command.CommandType = CommandType.StoredProcedure;
 
 
-                    command.Parameters.AddWithValue("roomName", room.RoomName);
-                    command.Parameters.AddWithValue("isFree", room.IsFree);
-                    command.Parameters.AddWithValue("dailyPrice", room.DailyPrice);
-                    command.Parameters.AddWithValue("hotelId", room.HotelId);
+                    command.Parameters.AddWithValue("firstName", manager.FirstName);
+                    command.Parameters.AddWithValue("lastName", manager.LastName);
+                    command.Parameters.AddWithValue("hotelID", manager.HotelId);
 
 
                     await connection.OpenAsync();
@@ -95,27 +93,28 @@ namespace HotelProject.Repository
 
         }
 
-        public async Task UpdateRoom(Room room)
+        public async Task UpdateManager(Manager manager)
         {
-            int roomCount = 0;
-            const string sqlSel = "SELECT COUNT (*) FROM Rooms";
+
+            string sqlUpdate = "sp_UpdateManager";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
-                    SqlCommand command = new SqlCommand(sqlSel, connection);
+                    SqlCommand command = new SqlCommand(sqlUpdate, connection);
+                    command.CommandType = CommandType.StoredProcedure;
+
+
+                    command.Parameters.AddWithValue("firstName", manager.FirstName);
+                    command.Parameters.AddWithValue("lastName", manager.LastName);
+                    command.Parameters.AddWithValue("hotelID", manager.HotelId);
+                    command.Parameters.AddWithValue("id", manager.Id);
 
                     await connection.OpenAsync();
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
+                    await command.ExecuteNonQueryAsync();
 
-                    while (reader.Read())
-                    {
-                        if (reader.HasRows)
-                        {
-                            roomCount = reader.GetInt32(0);
-                        }
-                    }
+
 
                 }
                 catch (Exception)
@@ -125,59 +124,15 @@ namespace HotelProject.Repository
                 finally
                 {
                     await connection.CloseAsync();
-
-                }
-            }
-            if (room.Id <= roomCount)
-            {
-
-                string sqlUpdate = "sp_UpdateRoom";
-
-                using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
-                {
-                    try
-                    {
-                        SqlCommand command = new SqlCommand(sqlUpdate, connection);
-                        command.CommandType = CommandType.StoredProcedure;
-
-
-                    
-                        command.Parameters.AddWithValue("id", room.Id);
-                        command.Parameters.AddWithValue("roomName", room.RoomName);
-                        command.Parameters.AddWithValue("isFree", room.IsFree);
-                        command.Parameters.AddWithValue("dailyPrice", room.DailyPrice);
-                        
-
-
-                        await connection.OpenAsync();
-                        await command.ExecuteNonQueryAsync();
-
-
-
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                    finally
-                    {
-                        await connection.CloseAsync();
-                    }
-
                 }
 
             }
-            else
-            {
-                throw new Exception();
-            }
-
 
         }
 
-        public async Task DeleteRoom(int id)
+        public async Task DeleteManager(int id)
         {
-            string sqlDelete = "sp_DeleteRoom";
+            string sqlDelete = "sp_DeleteManager";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
@@ -206,10 +161,10 @@ namespace HotelProject.Repository
             }
         }
 
-        public async Task<Room> ShowSingleRoom(int id)
+        public async Task<Manager> ShowSingleManager(int id)
         {
-            Room result = new();
-            const string sqlSel = "sp_ShowSingleRoom";
+            Manager result = new();
+            const string sqlSel = "sp_ShowSingleManager";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
@@ -217,7 +172,7 @@ namespace HotelProject.Repository
                 {
                     SqlCommand command = new SqlCommand(sqlSel, connection);
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("roomId", id);
+                    command.Parameters.AddWithValue("managerId", id);
 
                     await connection.OpenAsync();
                     SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -226,11 +181,11 @@ namespace HotelProject.Repository
                     {
                         if (reader.HasRows)
                         {
-                           // result.Id = reader.GetInt32(0);
-                            result.RoomName = !reader.IsDBNull(0) ? reader.GetString(0) : string.Empty;
-                            result.IsFree = !reader.IsDBNull(1) ? reader.GetBoolean(1) : false;
-                            result.DailyPrice = !reader.IsDBNull(2) ? reader.GetDouble(2) : 0;
-                            result.HotelId = !reader.IsDBNull(3) ? reader.GetInt32(3) : 0;
+                            result.FirstName = !reader.IsDBNull(0) ? reader.GetString(0) : string.Empty;
+                            result.LastName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty;
+                            result.HotelId = !reader.IsDBNull(2) ? reader.GetInt32(2) : 0;
+
+
                         }
                     }
                 }
@@ -247,5 +202,6 @@ namespace HotelProject.Repository
 
             return result;
         }
+
     }
 }

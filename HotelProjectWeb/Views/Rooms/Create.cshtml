@@ -3,8 +3,8 @@
     ViewData["Title"] = "ოთახის დამატება";
 }
 
-<div class="row">
-    <form asp-controller="Rooms" asp-action="CreatePOST" method="post">
+@* <div class="row"> *@
+     <form asp-controller="Rooms" asp-action="CreatePost" method="post">
         <div class="mb-3">
             <label asp-for="RoomName" class="form-label">ოთახის დასახელება</label>
             <input class="form-control" asp-for="RoomName" />
@@ -19,10 +19,13 @@
         </div>
         <div class="mb-3">
             <label asp-for="HotelId" class="form-label">სასტუმრო</label>
-            <input class="form-control" asp-for="HotelId" />
+            <select asp-for="HotelId" asp-items="ViewBag.Hotels" class="form-control"></select>
         </div>
         <div class="mb-3">
             <input class="btn btn-success" type="submit" value="დამატება" />
         </div>
-    </form>
-</div>
+     </form>
+@*  </div>  *@
+
+
+

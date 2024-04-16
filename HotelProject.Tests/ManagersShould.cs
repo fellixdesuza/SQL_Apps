@@ -1,10 +1,10 @@
-﻿using HotelProject.Repository;
-using HotelProject.Model;
+﻿using HotelProject.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HotelProject.Repository.MSDataSQLClient;
 
 namespace HotelProject.Tests
 {

@@ -9,7 +9,7 @@
                 <th>სახელი</th>
                 <th>გვარი</th>
                 <th>სასტუმროს დასახელება</th>
-                <th>სასტუმროს ID</th>
+             @*    <th>სასტუმროს ID</th> *@
             </tr>
         </thead>
         <tbody>
@@ -18,8 +18,8 @@
                 <tr>
                     <td>@manager.FirstName</td>
                     <td>@manager.LastName</td>
-                    <td>@manager.HotelName</td>
-                    <td>@manager.HotelId</td>
+                    <td>@manager.Hotel.HotelName</td>
+                   @*  <td>@manager.HotelId</td> *@
                     <td>
                         <a asp-controller="Managers" asp-action="Update" asp-route-id="@manager.Id" class="btn btn-warning">რედაქტირება</a>
                         <a asp-controller="Managers" asp-action="Delete" asp-route-id="@manager.Id" class="btn btn-danger">წაშლა</a>

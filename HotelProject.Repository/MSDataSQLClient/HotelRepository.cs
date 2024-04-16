@@ -1,6 +1,5 @@
 ﻿using HotelProject.Data;
-using HotelProject.Model;
-using HotelProject.Model;
+using HotelProject.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -10,10 +9,11 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Diagnostics.Metrics;
 using System.Net.NetworkInformation;
+using HotelProject.Repository.Interfaces;
 
-namespace HotelProject.Repository
+namespace HotelProject.Repository.MSDataSQLClient
 {
-    public class HotelRepository
+    public class HotelRepository : IHotelRepository
     {
 
         public async Task<List<Hotel>> GetHotels()
@@ -82,7 +82,8 @@ namespace HotelProject.Repository
                     await connection.OpenAsync();
                     int rowsEffect = await command.ExecuteNonQueryAsync();
 
-                    if (rowsEffect == 0) {
+                    if (rowsEffect == 0)
+                    {
                         throw new InvalidOperationException("Command effected zero rows");
                     }
 
@@ -103,24 +104,27 @@ namespace HotelProject.Repository
 
         public async Task UpdateHotel(Hotel hotel)
         {
-            int hotelCount = 0;
-            const string sqlSel = "SELECT COUNT (*) FROM Hotels";
+
+            string sqlUpdate = "sp_UpdateHotel";
 
             using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
             {
                 try
                 {
-                    SqlCommand command = new SqlCommand(sqlSel, connection);
-                    await connection.OpenAsync();
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
+                    SqlCommand command = new SqlCommand(sqlUpdate, connection);
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    while (reader.Read())
-                    {
-                        if (reader.HasRows)
-                        {
-                            hotelCount = reader.GetInt32(0);
-                        }
-                    }
+                    command.Parameters.AddWithValue("name", hotel.HotelName);
+                    command.Parameters.AddWithValue("rating", hotel.Rating);
+                    command.Parameters.AddWithValue("country", hotel.Country);
+                    command.Parameters.AddWithValue("city", hotel.City);
+                    command.Parameters.AddWithValue("phisicalAddress", hotel.PhisicalAddress);
+                    command.Parameters.AddWithValue("hotelId", hotel.Id);
+
+                    await connection.OpenAsync();
+                    command.ExecuteNonQuery();
+
+
 
                 }
                 catch (Exception)
@@ -133,49 +137,6 @@ namespace HotelProject.Repository
                 }
 
             }
-
-            if (hotel.Id <= hotelCount)
-            {
-
-                string sqlUpdate = "sp_UpdateHotel";
-
-                using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
-                {
-                    try
-                    {
-                        SqlCommand command = new SqlCommand(sqlUpdate, connection);
-                        command.CommandType = CommandType.StoredProcedure;
-
-                        command.Parameters.AddWithValue("name", hotel.HotelName);
-                        command.Parameters.AddWithValue("rating", hotel.Rating);
-                        command.Parameters.AddWithValue("country", hotel.Country);
-                        command.Parameters.AddWithValue("city", hotel.City);
-                        command.Parameters.AddWithValue("phisicalAddress", hotel.PhisicalAddress);
-                        command.Parameters.AddWithValue("hotelId", hotel.Id);
-
-                        await connection.OpenAsync();
-                        command.ExecuteNonQuery();
-
-
-
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                    finally
-                    {
-                        await connection.CloseAsync();
-                    }
-
-                }
-
-            }
-            else
-            {
-                throw new Exception();
-            }
-
 
         }
 
@@ -236,7 +197,7 @@ namespace HotelProject.Repository
                             result.City = !reader.IsDBNull(4) ? reader.GetString(4) : string.Empty;
                             result.PhisicalAddress = !reader.IsDBNull(5) ? reader.GetString(5) : string.Empty;
 
-                        } 
+                        }
                     }
                 }
                 catch (Exception)
@@ -251,6 +212,50 @@ namespace HotelProject.Repository
             }
 
             return result;
+        }
+        public async Task<List<Hotel>> GetHotelsWithoutManager()
+        {
+            List<Hotel> result = new();
+            const string sqlExpression = "GetHotelsWithoutManager";
+
+            using (SqlConnection connection = new(ApplicationDbContext.ConnectionString))
+            {
+                try
+                {
+                    await connection.OpenAsync();
+
+                    SqlCommand command = new(sqlExpression, connection);
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        if (reader.HasRows)
+                        {
+                            result.Add(new Hotel()
+                            {
+                                Id = reader.GetInt32(0),
+                                HotelName = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty,
+                                Rating = !reader.IsDBNull(2) ? reader.GetDouble(2) : 0,
+                                Country = !reader.IsDBNull(3) ? reader.GetString(3) : string.Empty,
+                                City = !reader.IsDBNull(4) ? reader.GetString(4) : string.Empty,
+                                PhisicalAddress = !reader.IsDBNull(5) ? reader.GetString(5) : string.Empty
+                            });
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    await connection.CloseAsync();
+                }
+
+                return result;
+            }
         }
     }
 }

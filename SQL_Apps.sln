@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34414.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HotelProjects", "HotelProjects", "{C45922C8-5B1B-4F2D-B18F-EF22035457C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelProject.Model", "HotelProjectModel\HotelProject.Model.csproj", "{6834EDC5-FDE0-4A1F-AA66-D5D0C148A0E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelProject.Models", "HotelProjectModel\HotelProject.Models.csproj", "{6834EDC5-FDE0-4A1F-AA66-D5D0C148A0E2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelProject.Data", "HotelProject.Data\HotelProject.Data.csproj", "{883ECA7E-0958-4D46-B602-6C26CA63949E}"
 EndProject
@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelProject.Repository", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelProject.Tests", "HotelProject.Tests\HotelProject.Tests.csproj", "{417DBFB1-9566-4169-834F-4FC787CA3920}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelProjectWeb", "HotelProjectWeb\HotelProjectWeb.csproj", "{319D0285-E916-4775-A9AB-8708382B5296}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelProjectWeb", "HotelProjectWeb\HotelProjectWeb.csproj", "{319D0285-E916-4775-A9AB-8708382B5296}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

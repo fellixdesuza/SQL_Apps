@@ -1,5 +1,8 @@
+using HotelProject.Data;
 using HotelProject.Repository;
-using HotelProjectWeb.Controllers;
+using HotelProject.Repository.Interfaces;
+using HotelProject.Repository.MSDataSQLClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelProjectWeb
 {
@@ -10,9 +13,10 @@ namespace HotelProjectWeb
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddScoped<HotelRepository>();
-            builder.Services.AddScoped<ManagerRepository>();
-            builder.Services.AddScoped<RoomRepository>();
+            builder.Services.AddDbContext<ApplicationDbContext>(options=>options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection")));
+            builder.Services.AddScoped<IHotelRepository, HotelRepositoryEF>();
+            builder.Services.AddScoped<IManagerRepository, ManagerRepositoryEF>();
+            builder.Services.AddScoped<IRoomRepository, RoomRepositoryEF>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
