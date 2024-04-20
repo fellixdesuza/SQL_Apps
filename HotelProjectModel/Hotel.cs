@@ -31,5 +31,6 @@ namespace HotelProject.Models
         public Manager Manager { get; set; }
 
         public ICollection<Room> Rooms { get; set; }
+
     }
 }
